@@ -1,0 +1,584 @@
+<div class="vehicle-details-page">
+
+  <!-- Back Navigation -->
+  <div class="details-header">
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="goBack()">
+
+      ← Back to Vehicles
+
+    </button>
+
+  </div>
+
+
+  <!-- Loading State -->
+  <div
+    class="state-card"
+    *ngIf="isLoading">
+
+    <div class="loader"></div>
+
+    <p>
+      Loading vehicle details...
+    </p>
+
+  </div>
+
+
+  <!-- Error State -->
+  <div
+    class="state-card error"
+    *ngIf="!isLoading && errorMessage">
+
+    <h3>
+      Unable to load vehicle
+    </h3>
+
+    <p>
+      {{ errorMessage }}
+    </p>
+
+    <button
+      type="button"
+      class="retry-button"
+      (click)="goBack()">
+
+      Back to Vehicles
+
+    </button>
+
+  </div>
+
+
+  <!-- Vehicle Details -->
+  <ng-container
+    *ngIf="!isLoading && vehicle">
+
+
+    <!-- =====================================================
+         VEHICLE HEADER
+         ===================================================== -->
+
+    <div class="vehicle-hero">
+
+      <div class="hero-left">
+
+        <div class="vehicle-icon">
+          EV
+        </div>
+
+
+        <div>
+
+          <div class="eyebrow">
+            VEHICLE DETAILS
+          </div>
+
+          <h1>
+            {{ vehicle.fleetNumber }}
+          </h1>
+
+          <p>
+            {{ vehicle.manufacturer }}
+            {{ vehicle.vehicleModel }}
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <span
+        class="status-badge"
+        [ngClass]="getStatusClass(vehicle.vehicleStatus)">
+
+        {{ vehicle.vehicleStatus }}
+
+      </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         INFORMATION CARDS
+         ===================================================== -->
+
+    <div class="details-grid">
+
+
+      <!-- Vehicle Identity -->
+
+      <div class="info-card">
+
+        <div class="card-title">
+          Vehicle Identity
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Fleet Number
+          </span>
+
+          <strong>
+            {{ vehicle.fleetNumber }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Registration
+          </span>
+
+          <strong>
+            {{ vehicle.registrationNumber }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            VIN
+          </span>
+
+          <strong>
+            {{ vehicle.vin }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Vehicle ID
+          </span>
+
+          <strong>
+            #{{ vehicle.vehicleID }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- Vehicle Specification -->
+
+      <div class="info-card">
+
+        <div class="card-title">
+          Vehicle Specification
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Manufacturer
+          </span>
+
+          <strong>
+            {{ vehicle.manufacturer }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Model
+          </span>
+
+          <strong>
+            {{ vehicle.vehicleModel }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Depot
+          </span>
+
+          <strong>
+            {{ vehicle.depot || 'Not assigned' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- Operations -->
+
+      <div class="info-card">
+
+        <div class="card-title">
+          Operations
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Current Odometer
+          </span>
+
+          <strong>
+
+            {{ vehicle.currentOdometerKm | number:'1.0-0' }}
+
+            km
+
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Fleet Availability
+          </span>
+
+          <strong
+            [class.available-text]="
+              vehicle.vehicleStatus === 'AVAILABLE'
+            ">
+
+            {{
+              vehicle.vehicleStatus === 'AVAILABLE'
+                ? 'Available'
+                : 'Unavailable'
+            }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Record Status
+          </span>
+
+          <strong>
+
+            {{ vehicle.isActive ? 'Active' : 'Inactive' }}
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- System Information -->
+
+      <div class="info-card">
+
+        <div class="card-title">
+          System Information
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Vehicle ID
+          </span>
+
+          <strong>
+            {{ vehicle.vehicleID }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>
+            Concurrency Version
+          </span>
+
+          <strong class="version">
+            {{ vehicle.rowVersion }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         VEHICLE OPERATIONS
+         ===================================================== -->
+
+    <div class="action-card">
+
+      <div>
+
+        <div class="card-title">
+          Vehicle Operations
+        </div>
+
+        <p>
+          Operational actions for this vehicle will be
+          available based on its current fleet status.
+        </p>
+
+      </div>
+
+
+      <div class="actions">
+
+
+        <!-- AVAILABLE VEHICLE -->
+
+        <button
+          *ngIf="vehicle.vehicleStatus === 'AVAILABLE'"
+          type="button"
+          class="primary-action">
+
+          Assign Vehicle
+
+        </button>
+
+
+        <!-- ASSIGNED VEHICLE -->
+
+        <button
+          *ngIf="vehicle.vehicleStatus === 'ASSIGNED'"
+          type="button"
+          class="secondary-action"
+          (click)="openUnassignDialog()"
+          [disabled]="isUnassigning">
+
+          Unassign Driver
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </ng-container>
+
+
+
+  <!-- =========================================================
+       UNASSIGN DRIVER MODAL
+       ========================================================= -->
+
+  <div
+    class="unassign-overlay"
+    *ngIf="showUnassignDialog">
+
+
+    <div
+      class="unassign-modal"
+      (click)="$event.stopPropagation()">
+
+
+      <!-- Modal Header -->
+
+      <div class="modal-header">
+
+
+        <div class="modal-warning-icon">
+          !
+        </div>
+
+
+        <div class="modal-heading">
+
+          <h2>
+            Unassign Driver
+          </h2>
+
+          <p>
+            End the current driver assignment for this vehicle.
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closeUnassignDialog()"
+          [disabled]="isUnassigning">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+
+      <!-- Vehicle Summary -->
+
+      <div class="vehicle-summary">
+
+
+        <div class="summary-icon">
+          EV
+        </div>
+
+
+        <div class="summary-content">
+
+          <strong>
+            {{ vehicle?.fleetNumber }}
+          </strong>
+
+          <span>
+            {{ vehicle?.manufacturer }}
+            {{ vehicle?.vehicleModel }}
+          </span>
+
+        </div>
+
+
+        <span class="assigned-badge">
+
+          ASSIGNED
+
+        </span>
+
+      </div>
+
+
+
+      <!-- Vehicle Details -->
+
+      <div class="assignment-details">
+
+
+        <div class="detail-block">
+
+          <span class="detail-label">
+            Registration
+          </span>
+
+          <strong>
+            {{ vehicle?.registrationNumber }}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-block">
+
+          <span class="detail-label">
+            Vehicle ID
+          </span>
+
+          <strong>
+            #{{ vehicle?.vehicleID }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- Reason -->
+
+      <div class="reason-section">
+
+
+        <label for="unassignReason">
+
+          Reason
+
+          <span class="required">
+            *
+          </span>
+
+        </label>
+
+
+        <textarea
+          id="unassignReason"
+          [(ngModel)]="unassignReason"
+          rows="4"
+          placeholder="Enter the reason for unassigning this driver...">
+        </textarea>
+
+
+        <small>
+          This reason will be recorded in the assignment history.
+        </small>
+
+      </div>
+
+
+
+      <!-- Modal Actions -->
+
+      <div class="modal-actions">
+
+
+        <button
+          type="button"
+          class="modal-cancel"
+          (click)="closeUnassignDialog()"
+          [disabled]="isUnassigning">
+
+          Cancel
+
+        </button>
+
+
+        <button
+          type="button"
+          class="modal-confirm"
+          (click)="confirmUnassign()"
+          [disabled]="
+            isUnassigning ||
+            !unassignReason.trim()
+          ">
+
+          <span *ngIf="!isUnassigning">
+
+            Confirm Unassign
+
+          </span>
+
+
+          <span *ngIf="isUnassigning">
+
+            Unassigning...
+
+          </span>
+
+        </button>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+</div>

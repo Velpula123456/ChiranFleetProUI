@@ -1,0 +1,314 @@
+<div class="assignment-page">
+
+  <!-- Header -->
+  <div class="page-header">
+
+    <div>
+      <div class="eyebrow">FLEET OPERATIONS</div>
+
+      <h1>Assign Vehicle</h1>
+
+      <p>
+        Assign an available vehicle to an eligible driver.
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- Success -->
+  <div
+    class="message success"
+    *ngIf="successMessage">
+
+    <span class="message-icon">✓</span>
+
+    <span>{{ successMessage }}</span>
+
+  </div>
+
+
+  <!-- Error -->
+  <div
+    class="message error"
+    *ngIf="errorMessage">
+
+    <span class="message-icon">!</span>
+
+    <span>{{ errorMessage }}</span>
+
+  </div>
+
+
+  <div class="assignment-layout">
+
+
+    <!-- VEHICLE -->
+    <section class="assignment-card">
+
+      <div class="card-header">
+
+        <div class="step-number">
+          1
+        </div>
+
+        <div>
+          <h2>Select Vehicle</h2>
+
+          <p>
+            Choose an available vehicle.
+          </p>
+        </div>
+
+      </div>
+
+
+      <!-- Loading -->
+      <div
+        class="loading-state"
+        *ngIf="isLoadingVehicles">
+
+        Loading available vehicles...
+
+      </div>
+
+
+      <!-- Vehicle list -->
+      <div
+        class="vehicle-list"
+        *ngIf="!isLoadingVehicles">
+
+        <button
+          type="button"
+          class="vehicle-option"
+          *ngFor="let vehicle of vehicles"
+          [class.selected]="selectedVehicle?.vehicleID === vehicle.vehicleID"
+          (click)="selectVehicle(vehicle)">
+
+          <div class="vehicle-icon">
+            EV
+          </div>
+
+          <div class="vehicle-info">
+
+            <strong>
+              {{ vehicle.fleetNumber }}
+            </strong>
+
+            <span>
+              {{ vehicle.vehicleModel }}
+              ·
+              {{ vehicle.registrationNumber }}
+            </span>
+
+            <small>
+              {{ vehicle.depot || 'No depot assigned' }}
+            </small>
+
+          </div>
+
+          <div class="vehicle-status">
+            AVAILABLE
+          </div>
+
+        </button>
+
+
+        <div
+          class="empty-state"
+          *ngIf="vehicles.length === 0">
+
+          <strong>No available vehicles</strong>
+
+          <span>
+            There are currently no vehicles ready for assignment.
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- DRIVER -->
+    <section class="assignment-card">
+
+      <div class="card-header">
+
+        <div class="step-number">
+          2
+        </div>
+
+        <div>
+          <h2>Select Driver</h2>
+
+          <p>
+            Choose an available driver.
+          </p>
+        </div>
+
+      </div>
+
+
+      <!-- Loading -->
+      <div
+        class="loading-state"
+        *ngIf="isLoadingDrivers">
+
+        Loading available drivers...
+
+      </div>
+
+
+      <!-- Driver list -->
+      <div
+        class="driver-list"
+        *ngIf="!isLoadingDrivers">
+
+        <button
+          type="button"
+          class="driver-option"
+          *ngFor="let driver of drivers"
+          [class.selected]="selectedDriver?.driverID === driver.driverID"
+          (click)="selectDriver(driver)">
+
+          <div class="driver-avatar">
+
+            {{ driver.firstName.charAt(0) }}
+            {{ driver.lastName.charAt(0) }}
+
+          </div>
+
+          <div class="driver-info">
+
+            <strong>
+              {{ getDriverName(driver) }}
+            </strong>
+
+            <span>
+              {{ driver.driverCode }}
+            </span>
+
+            <small>
+              {{ driver.phoneNumber || 'Phone not available' }}
+            </small>
+
+          </div>
+
+          <div class="driver-status">
+            AVAILABLE
+          </div>
+
+        </button>
+
+
+        <div
+          class="empty-state"
+          *ngIf="drivers.length === 0">
+
+          <strong>No available drivers</strong>
+
+          <span>
+            There are currently no eligible drivers.
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CONFIRMATION -->
+    <section class="assignment-card confirmation-card">
+
+      <div class="card-header">
+
+        <div class="step-number">
+          3
+        </div>
+
+        <div>
+          <h2>Confirm Assignment</h2>
+
+          <p>
+            Review the assignment before submitting.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="summary">
+
+        <div class="summary-row">
+
+          <span>Vehicle</span>
+
+          <strong>
+            {{ selectedVehicle?.fleetNumber || 'Not selected' }}
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>Model</span>
+
+          <strong>
+            {{ selectedVehicle?.vehicleModel || '—' }}
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>Driver</span>
+
+          <strong>
+            {{
+              selectedDriver
+                ? getDriverName(selectedDriver)
+                : 'Not selected'
+            }}
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>Assignment Type</span>
+
+          <strong>DRIVER</strong>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="assign-button"
+        [disabled]="!canAssign()"
+        (click)="assignVehicle()">
+
+        <span *ngIf="!isAssigning">
+          Confirm Assignment
+        </span>
+
+        <span *ngIf="isAssigning">
+          Assigning...
+        </span>
+
+      </button>
+
+    </section>
+
+  </div>
+
+</div>

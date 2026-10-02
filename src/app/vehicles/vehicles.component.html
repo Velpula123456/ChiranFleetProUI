@@ -1,0 +1,225 @@
+<div class="vehicles-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+
+    <div>
+      <div class="eyebrow">FLEET MANAGEMENT</div>
+
+      <h1>Vehicles</h1>
+
+      <p>
+        Monitor and manage your EV fleet in real time.
+      </p>
+    </div>
+
+    <button class="primary-action">
+      + Add Vehicle
+    </button>
+
+  </div>
+
+
+  <!-- Tabs -->
+
+  <div class="vehicle-tabs">
+
+    <button
+      [class.active]="activeTab === 'all'"
+      (click)="selectTab('all')">
+
+      <span>All Vehicles</span>
+
+    </button>
+
+    <button
+      [class.active]="activeTab === 'available'"
+      (click)="selectTab('available')">
+
+      <span class="tab-dot available"></span>
+
+      Available
+
+    </button>
+
+    <button
+      [class.active]="activeTab === 'unavailable'"
+      (click)="selectTab('unavailable')">
+
+      <span class="tab-dot unavailable"></span>
+
+      Unavailable
+
+    </button>
+
+  </div>
+
+
+  <!-- Loading -->
+
+  <div
+    class="state-card"
+    *ngIf="isLoading">
+
+    <div class="loader"></div>
+
+    <p>Loading fleet vehicles...</p>
+
+  </div>
+
+
+  <!-- Error -->
+
+  <div
+    class="state-card error"
+    *ngIf="!isLoading && errorMessage">
+
+    <p>{{ errorMessage }}</p>
+
+    <button
+      class="retry-button"
+      (click)="loadVehicles()">
+
+      Retry
+
+    </button>
+
+  </div>
+
+
+  <!-- Vehicle Grid -->
+
+  <div
+    class="vehicle-grid"
+    *ngIf="!isLoading && !errorMessage">
+
+    <div
+      class="vehicle-card"
+      *ngFor="let vehicle of vehicles">
+
+      <!-- Card Header -->
+
+      <div class="vehicle-card-header">
+
+        <div>
+
+          <div class="fleet-number">
+            {{ vehicle.fleetNumber }}
+          </div>
+
+          <div class="registration">
+            {{ vehicle.registrationNumber }}
+          </div>
+
+        </div>
+
+        <span
+          class="status-badge"
+          [ngClass]="getStatusClass(vehicle.vehicleStatus)">
+
+          {{ vehicle.vehicleStatus }}
+
+        </span>
+
+      </div>
+
+
+      <!-- Vehicle Identity -->
+
+      <div class="vehicle-identity">
+
+        <div class="vehicle-icon">
+          EV
+        </div>
+
+        <div>
+
+          <h3>
+            {{ vehicle.vehicleModel }}
+          </h3>
+
+          <p>
+            {{ vehicle.manufacturer }}
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Details -->
+
+      <div class="vehicle-details">
+
+        <div class="detail-item">
+
+          <span class="label">
+            Depot
+          </span>
+
+          <span class="value">
+            {{ vehicle.depot || 'Not assigned' }}
+          </span>
+
+        </div>
+
+        <div class="detail-item">
+
+          <span class="label">
+            Odometer
+          </span>
+
+          <span class="value">
+            {{ vehicle.currentOdometerKm | number:'1.0-0' }} km
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Footer -->
+
+      <div class="vehicle-card-footer">
+
+        <span class="vehicle-id">
+          Vehicle #{{ vehicle.vehicleID }}
+        </span>
+
+        <button
+           class="view-button"
+           [routerLink]="['/vehicles', vehicle.vehicleID]">
+
+         View Details →
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Empty State -->
+
+  <div
+    class="state-card"
+    *ngIf="
+      !isLoading &&
+      !errorMessage &&
+      vehicles.length === 0
+    ">
+
+    <div class="empty-icon">
+      EV
+    </div>
+
+    <h3>No vehicles found</h3>
+
+    <p>
+      There are no vehicles in this category.
+    </p>
+
+  </div>
+
+</div>

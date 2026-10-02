@@ -1,0 +1,447 @@
+<div class="dashboard-page">
+
+  <!-- Header -->
+  <div class="dashboard-header">
+
+    <div>
+      <div class="eyebrow">FLEET OVERVIEW</div>
+
+      <h1>Fleet Dashboard</h1>
+
+      <p>
+        Monitor your EV fleet, operations and availability in real time.
+      </p>
+    </div>
+
+    <div class="live-indicator">
+      <span></span>
+      Live Fleet
+    </div>
+
+  </div>
+
+
+  <!-- Loading -->
+  <div
+    class="state-card"
+    *ngIf="loading">
+
+    <div class="loader"></div>
+
+    <p>Loading fleet information...</p>
+
+  </div>
+
+
+  <!-- Error -->
+  <div
+    class="state-card error"
+    *ngIf="!loading && errorMessage">
+
+    <p>{{ errorMessage }}</p>
+
+    <button
+      class="retry-button"
+      (click)="loadDashboardData()">
+
+      Retry
+
+    </button>
+
+  </div>
+
+
+  <!-- Dashboard -->
+  <ng-container *ngIf="!loading && !errorMessage">
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+
+      <!-- Total Vehicles -->
+      <div class="kpi-card">
+
+        <div class="kpi-top">
+
+          <span class="kpi-label">
+            Total Vehicles
+          </span>
+
+          <div class="kpi-icon vehicle">
+            EV
+          </div>
+
+        </div>
+
+        <div class="kpi-value">
+          {{ totalVehicles }}
+        </div>
+
+        <div class="kpi-description">
+          Registered fleet vehicles
+        </div>
+
+      </div>
+
+
+      <!-- Available -->
+      <div class="kpi-card available-card">
+
+        <div class="kpi-top">
+
+          <span class="kpi-label">
+            Available
+          </span>
+
+          <div class="kpi-icon available">
+            ✓
+          </div>
+
+        </div>
+
+        <div class="kpi-value">
+          {{ availableVehicles }}
+        </div>
+
+        <div class="kpi-description">
+          Ready for assignment
+        </div>
+
+      </div>
+
+
+      <!-- Unavailable -->
+      <div class="kpi-card">
+
+        <div class="kpi-top">
+
+          <span class="kpi-label">
+            Unavailable
+          </span>
+
+          <div class="kpi-icon unavailable">
+            !
+          </div>
+
+        </div>
+
+        <div class="kpi-value">
+          {{ unavailableVehicles }}
+        </div>
+
+        <div class="kpi-description">
+          Currently operationally unavailable
+        </div>
+
+      </div>
+
+
+      <!-- Fleet Utilization -->
+      <div class="kpi-card">
+
+        <div class="kpi-top">
+
+          <span class="kpi-label">
+            Fleet Utilization
+          </span>
+
+          <div class="kpi-icon utilization">
+            %
+          </div>
+
+        </div>
+
+        <div class="kpi-value">
+          {{ utilizationPercentage | number:'1.0-0' }}%
+        </div>
+
+        <div class="kpi-description">
+          Vehicles currently unavailable
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="dashboard-grid">
+
+      <!-- Vehicle Status -->
+      <div class="dashboard-card status-card">
+
+        <div class="card-header">
+
+          <div>
+
+            <h2>Vehicle Status</h2>
+
+            <p>
+              Current fleet distribution
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="status-content">
+
+          <!-- Dynamic Status Ring -->
+          <div
+            class="status-ring"
+            [style.--available-percentage]="availabilityPercentage">
+
+            <div class="ring-center">
+
+              <strong>
+                {{ totalVehicles }}
+              </strong>
+
+              <span>
+                Vehicles
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Status Legend -->
+          <div class="status-legend">
+
+            <div class="legend-item">
+
+              <span class="legend-dot available"></span>
+
+              <div>
+
+                <strong>
+                  {{ availableVehicles }}
+                </strong>
+
+                <span>
+                  Available
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="legend-item">
+
+              <span class="legend-dot unavailable"></span>
+
+              <div>
+
+                <strong>
+                  {{ unavailableVehicles }}
+                </strong>
+
+                <span>
+                  Unavailable
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- View Details
+      <div
+  class="vehicle-row"
+  *ngFor="let vehicle of vehicles | slice:0:5">
+
+  <div class="vehicle-avatar">
+    EV
+  </div>
+
+  <div class="vehicle-info">
+
+    <strong>
+      {{ vehicle.fleetNumber }}
+    </strong>
+
+    <span>
+      {{ vehicle.vehicleModel }}
+      ·
+      {{ vehicle.registrationNumber }}
+    </span>
+
+  </div>
+
+  <span
+    class="status-badge"
+    [ngClass]="
+      vehicle.vehicleStatus
+        .toLowerCase()
+        .replace('_', '-')
+    ">
+
+    {{ vehicle.vehicleStatus }}
+
+  </span>
+
+  <button
+    type="button"
+    class="view-button"
+    [routerLink]="['/vehicles', vehicle.vehicleID]">
+
+    View Details →
+
+  </button>
+
+</div> -->
+
+
+      <!-- Fleet Vehicles -->
+      <div class="dashboard-card recent-card">
+
+        <div class="card-header">
+
+          <div>
+
+            <h2>Fleet Vehicles</h2>
+
+            <p>
+              Latest vehicle records
+            </p>
+
+          </div>
+
+          <a routerLink="/vehicles">
+            View All →
+          </a>
+
+        </div>
+
+
+        <!-- Vehicle List -->
+        <div
+          class="vehicle-list"
+          *ngIf="vehicles.length > 0">
+
+          <div
+            class="vehicle-row"
+            *ngFor="let vehicle of vehicles | slice:0:5">
+
+            <div class="vehicle-avatar">
+              EV
+            </div>
+
+
+            <div class="vehicle-info">
+
+              <strong>
+                {{ vehicle.fleetNumber }}
+              </strong>
+
+              <span>
+                {{ vehicle.vehicleModel }}
+                ·
+                {{ vehicle.registrationNumber }}
+              </span>
+
+            </div>
+
+
+            <span
+              class="status-badge"
+              [ngClass]="
+                vehicle.vehicleStatus
+                  .toLowerCase()
+                  .replace('_', '-')
+              ">
+
+              {{ vehicle.vehicleStatus }}
+
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- Empty State -->
+        <div
+          class="empty-state"
+          *ngIf="vehicles.length === 0">
+
+          No vehicle data available.
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Lower Section -->
+    <div class="lower-grid">
+
+      <!-- Green Fleet -->
+      <div class="green-card">
+
+        <div class="green-icon">
+          EV
+        </div>
+
+        <div>
+
+          <div class="eyebrow">
+            FLEETPRO EV
+          </div>
+
+          <h2>
+            Greener. Smarter. Cleaner.
+          </h2>
+
+          <p>
+            Manage your electric fleet with real-time
+            operational visibility.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Fleet Metrics -->
+      <div class="metric-card">
+
+        <span class="metric-label">
+          Fleet Availability
+        </span>
+
+        <strong>
+          {{ availabilityPercentage | number:'1.0-0' }}%
+        </strong>
+
+
+        <!-- Dynamic Availability Bar -->
+        <div class="metric-bar">
+
+          <div
+            class="metric-fill"
+            [style.width.%]="availabilityPercentage">
+          </div>
+
+        </div>
+
+
+        <span class="metric-description">
+          Vehicles ready for operations
+        </span>
+
+      </div>
+
+    </div>
+
+  </ng-container>
+
+</div>
